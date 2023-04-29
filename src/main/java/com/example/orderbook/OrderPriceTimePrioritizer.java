@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 
-public class OrderPriceTimePrioritizer {
+class OrderPriceTimePrioritizer {
     private final char side;
 
     private final Map<Double, OrderLevel> orders;
@@ -25,15 +25,15 @@ public class OrderPriceTimePrioritizer {
         this.orderLevels = new ConcurrentHashMap<>();
     }
 
-    public static OrderPriceTimePrioritizer bids() {
+    static OrderPriceTimePrioritizer bids() {
         return new OrderPriceTimePrioritizer('B', Comparator.reverseOrder());
     }
 
-    public static OrderPriceTimePrioritizer offers() {
+    static OrderPriceTimePrioritizer offers() {
         return new OrderPriceTimePrioritizer('O', Comparator.naturalOrder());
     }
 
-    public void addOrder(Order order) {
+    void addOrder(Order order) {
         OrderLevel orderLevel;
         synchronized (orders) {
             orderLevel = orders.computeIfAbsent(order.getPrice(), price -> new OrderLevel(side, price));
@@ -42,7 +42,7 @@ public class OrderPriceTimePrioritizer {
         orderLevels.put(order.getId(), orderLevel);
     }
 
-    public void deleteOrder(long orderId) {
+    void deleteOrder(long orderId) {
         OrderLevel orderLevel = orderLevels.remove(orderId);
         if (orderLevel == null) {
             return;
@@ -50,11 +50,11 @@ public class OrderPriceTimePrioritizer {
         orderLevel.deleteOrder(orderId);
     }
 
-    public void resizeOrder(long orderId, long newSize) {
+    void resizeOrder(long orderId, long newSize) {
         Optional.ofNullable(orderLevels.get(orderId)).ifPresent(orderLevel -> orderLevel.resize(orderId, newSize));
     }
 
-    public List<Order> getOrders() {
+    List<Order> getOrders() {
         List<OrderLevel> orderLevels;
         synchronized (orders) {
             Collection<OrderLevel> values = orders.values();
@@ -64,7 +64,7 @@ public class OrderPriceTimePrioritizer {
         return orderLevels.stream().flatMap(orderLevel -> orderLevel.getOrders().stream()).collect(Collectors.toList());
     }
 
-    public Optional<Double> getLevelPrice(int level) {
+    Optional<Double> getLevelPrice(int level) {
         synchronized (orders) {
             Iterator<OrderLevel> values = orders.values().iterator();
             int myLevel = 0;
@@ -83,7 +83,7 @@ public class OrderPriceTimePrioritizer {
         return Optional.empty();
     }
 
-    public long getLevelTotalSize(int level) {
+    long getLevelTotalSize(int level) {
         synchronized (orders) {
             Iterator<OrderLevel> values = orders.values().iterator();
             int myLevel = 0;

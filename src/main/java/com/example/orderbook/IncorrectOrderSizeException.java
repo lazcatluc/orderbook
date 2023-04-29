@@ -1,7 +1,7 @@
 package com.example.orderbook;
 
-public class IncorrectOrderSizeException extends RuntimeException {
-    public IncorrectOrderSizeException(long size) {
+class IncorrectOrderSizeException extends RuntimeException {
+    IncorrectOrderSizeException(long size) {
         super("Incorrect size '" + size + "'. A positive value is expected");
     }
 }

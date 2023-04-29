@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class OrderBookTest {
+class OrderBookTest {
     private final int ordersCount = 6_000_000;
     private final int parallelism = 16;
     private OrderBook orderBook;
@@ -22,7 +22,7 @@ public class OrderBookTest {
     private List<Order> orders;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         orderBook = new OrderBook();
         executors = new ArrayList<>();
         IntStream.range(0, parallelism).forEach(i -> executors.add(Executors.newSingleThreadExecutor()));
@@ -33,7 +33,7 @@ public class OrderBookTest {
     }
 
     @Test
-    public void processesOrders() {
+    void processesOrders() {
         int batch = 0;
         int batches = 100;
         do {

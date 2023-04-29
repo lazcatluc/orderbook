@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-public class OrderPriceTimePrioritizerTest {
+class OrderPriceTimePrioritizerTest {
     @Test
-    public void ordersBidsByHighestPriceTime() {
+    void ordersBidsByHighestPriceTime() {
         OrderPriceTimePrioritizer orderPriceTimePrioritizer = OrderPriceTimePrioritizer.bids();
         orderPriceTimePrioritizer.addOrder(new Order(1, 1.0, 'B', 1));
         orderPriceTimePrioritizer.addOrder(new Order(2, 2.0, 'B', 1));
@@ -22,7 +22,7 @@ public class OrderPriceTimePrioritizerTest {
     }
 
     @Test
-    public void ordersOffersByLowestPriceTime() {
+    void ordersOffersByLowestPriceTime() {
         OrderPriceTimePrioritizer orderPriceTimePrioritizer = OrderPriceTimePrioritizer.offers();
         orderPriceTimePrioritizer.addOrder(new Order(1, 1.0, 'O', 1));
         orderPriceTimePrioritizer.addOrder(new Order(2, 2.0, 'O', 1));
@@ -35,7 +35,7 @@ public class OrderPriceTimePrioritizerTest {
     }
 
     @Test
-    public void getsNewCurrentLevelAfterItWasDeleted() {
+    void getsNewCurrentLevelAfterItWasDeleted() {
         OrderPriceTimePrioritizer orderPriceTimePrioritizer = OrderPriceTimePrioritizer.offers();
         orderPriceTimePrioritizer.addOrder(new Order(1, 1.0, 'O', 1));
         orderPriceTimePrioritizer.addOrder(new Order(2, 2.0, 'O', 1));

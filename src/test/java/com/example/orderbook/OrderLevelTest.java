@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
-public class OrderLevelTest {
+class OrderLevelTest {
     private final char side = 'O';
     private final double price = 1.0;
     @Test
-    public void resizeShouldNotAffectTimePriority() {
+    void resizeShouldNotAffectTimePriority() {
         OrderLevel orderLevel = new OrderLevel(side, price);
         orderLevel.addOrder(new Order(1, price, side, 1));
         orderLevel.addOrder(new Order(2, price, side, 1));
@@ -26,7 +26,7 @@ public class OrderLevelTest {
     }
 
     @Test
-    public void deleteAndReAddShouldAffectTimePriority() {
+    void deleteAndReAddShouldAffectTimePriority() {
         OrderLevel orderLevel = new OrderLevel(side, price);
         orderLevel.addOrder(new Order(1, price, side, 1));
         orderLevel.addOrder(new Order(2, price, side, 1));
