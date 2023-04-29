@@ -46,6 +46,12 @@ class OrderBookTest {
             // 10% resizes - orders with size 9 resized to size 5, so only orders with sizes 5, 6, 7 and 8 remain
             batchedOrders.parallelStream().filter(order -> order.getSize() == 9).forEach(
                     order -> executors.get((int) (order.getId() % parallelism)).submit(() -> orderBook.resizeOrder(order.getId(), order.getSize() - 4)));
+            char querySide = batch % 2 == 0 ? 'B' : 'O';
+            executors.get(batch % executors.size()).submit(() -> {
+                orderBook.getOrders(querySide);
+                orderBook.getLevelPrice(querySide, 100);
+                orderBook.getLevelTotalSize(querySide, 1);
+            });
         } while (++batch < batches);
         executors.forEach(ExecutorService::shutdown);
         assertThat(executors.stream().allMatch(executorService -> {
