@@ -37,8 +37,8 @@ class OrderPriceTimePrioritizer {
         OrderLevel orderLevel;
         synchronized (orders) {
             orderLevel = orders.computeIfAbsent(order.getPrice(), price -> new OrderLevel(side, price));
+            orderLevel.addOrder(order);
         }
-        orderLevel.addOrder(order);
         orderLevels.put(order.getId(), orderLevel);
     }
 
@@ -58,7 +58,7 @@ class OrderPriceTimePrioritizer {
         List<OrderLevel> orderLevels;
         synchronized (orders) {
             Collection<OrderLevel> values = orders.values();
-            values.removeIf(e -> e.getTotalSize() == 0);
+            values.removeIf(orderLevel -> orderLevel.getTotalSize() == 0);
             orderLevels = new ArrayList<>(values);
         }
         return orderLevels.stream().flatMap(orderLevel -> orderLevel.getOrders().stream()).collect(Collectors.toList());
