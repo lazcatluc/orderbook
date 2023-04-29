@@ -3,6 +3,7 @@ package com.example.orderbook;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,25 +55,51 @@ public class OrderPriceTimePrioritizer {
     }
 
     public List<Order> getOrders() {
-        return getOrderLevelsList().stream().flatMap(orderLevel -> orderLevel.getOrders().stream())
-                .collect(Collectors.toList());
-    }
-
-    public Optional<Double> getLevelPrice(int level) {
-        return getOrderLevelsList().stream().filter(orderLevel -> orderLevel.getTotalSize() > 0)
-                .skip(level - 1).findFirst().map(OrderLevel::getPrice);
-    }
-
-    public long getLevelTotalSize(int level) {
-        return getOrderLevelsList().stream().map(OrderLevel::getTotalSize).filter(totalSize -> totalSize > 0)
-                .skip(level - 1).findFirst().orElse(0L);
-    }
-
-    private List<OrderLevel> getOrderLevelsList() {
+        List<OrderLevel> orderLevels;
         synchronized (orders) {
             Collection<OrderLevel> values = orders.values();
             values.removeIf(e -> e.getTotalSize() == 0);
-            return new ArrayList<>(values);
+            orderLevels = new ArrayList<>(values);
         }
+        return orderLevels.stream().flatMap(orderLevel -> orderLevel.getOrders().stream()).collect(Collectors.toList());
     }
+
+    public Optional<Double> getLevelPrice(int level) {
+        synchronized (orders) {
+            Iterator<OrderLevel> values = orders.values().iterator();
+            int myLevel = 0;
+            while (values.hasNext()) {
+                OrderLevel orderLevel = values.next();
+                if (orderLevel.getTotalSize() == 0) {
+                    values.remove();
+                } else {
+                    myLevel++;
+                    if (myLevel == level) {
+                        return Optional.of(orderLevel.getPrice());
+                    }
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public long getLevelTotalSize(int level) {
+        synchronized (orders) {
+            Iterator<OrderLevel> values = orders.values().iterator();
+            int myLevel = 0;
+            while (values.hasNext()) {
+                long currentSize = values.next().getTotalSize();
+                if (currentSize == 0) {
+                    values.remove();
+                } else {
+                    myLevel++;
+                    if (myLevel == level) {
+                        return currentSize;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
 }
