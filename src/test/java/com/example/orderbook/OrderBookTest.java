@@ -3,6 +3,7 @@ package com.example.orderbook;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 public class OrderBookTest {
     private final int ordersCount = 6_000_000;
     private final int parallelism = 16;
-    private final int repeatedPrices = 100;
     private OrderBook orderBook;
     private List<ExecutorService> executors;
     private List<Order> orders;
@@ -28,7 +28,7 @@ public class OrderBookTest {
         IntStream.range(0, parallelism).forEach(i -> executors.add(Executors.newSingleThreadExecutor()));
         orders = new ArrayList<>();
         LongStream.range(0, ordersCount).forEach(i ->
-                orders.add(new Order(i, i % 3 > 0 ? i % repeatedPrices  : (Math.random() * repeatedPrices), i % 2 == 0 ? 'B':'O', i % 10)));
+                orders.add(new Order(i, i % 2 > 0 ? 1.0  : (1 + Math.random() * 100), i % 2 == 0 ? 'B':'O', i % 10)));
         Collections.shuffle(orders);
     }
 
@@ -61,5 +61,8 @@ public class OrderBookTest {
         long actualSumOfAllSizeLayers = orderBook.getOrders('B').stream().mapToLong(Order::getSize).sum()+
                 orderBook.getOrders('O').stream().mapToLong(Order::getSize).sum();
         assertThat(actualSumOfAllSizeLayers).isEqualTo(expectedSumOfAllSizeLayers);
+
+        assertThat(orderBook.getLevelPrice('O', 1)).isEqualTo(Optional.of(1.0));
+        assertThat(orderBook.getLevelTotalSize('O', 1)).isEqualTo( (ordersCount / 10) * (5 + 7));
     }
 }
